@@ -544,6 +544,7 @@ EL::StatusCode BasicEventSelection :: initialize ()
   // initialize the CP::PileupReweightingTool
   //
 
+  std::cout<<"lshi test doPUreweighting "<<m_doPUreweighting<<std::endl;
   if ( m_doPUreweighting ) {
 
     std::vector<std::string> PRWFiles;
@@ -594,6 +595,7 @@ EL::StatusCode BasicEventSelection :: initialize ()
       }
     }
 
+    std::cout<<"lshi test autoconfigPRW "<<m_autoconfigPRW<<std::endl;
     if(m_autoconfigPRW)
       {	ANA_CHECK( autoconfigurePileupRWTool() ); }
     else
@@ -613,7 +615,8 @@ EL::StatusCode BasicEventSelection :: initialize ()
         ANA_CHECK( m_pileup_tool_handle.setProperty("LumiCalcFiles", lumiCalcFiles));
       }
     ANA_CHECK( m_pileup_tool_handle.setProperty("UsePeriodConfig", m_periodConfig) );
-    ANA_CHECK( m_pileup_tool_handle.setProperty("OutputLevel", msg().level() ));
+    //ANA_CHECK( m_pileup_tool_handle.setProperty("OutputLevel", msg().level() ));
+    ANA_CHECK( m_pileup_tool_handle.setProperty("OutputLevel", msgLvl(MSG::DEBUG) )); // lshi
     if ( !m_triggerUnprescaleList.empty() ) {
       // We need to make an instance of ITrigDecisionTool:
       asg::AnaToolHandle<Trig::ITrigDecisionTool> iTrigDecTool_handle {"Trig::TrigDecisionTool/TrigDecisionTool"};
@@ -1124,28 +1127,29 @@ StatusCode BasicEventSelection::autoconfigurePileupRWTool()
   // Determine simulation flavour
   std::string SimulationFlavour = isFastSim() ? ( isAF3() ? "AF3" : "AFII" ) : "FS";
 
-  // Extract campaign automatically from Run Number
-  std::string mcCampaignMD = "";
+  //// Extract campaign automatically from Run Number
+  //std::string mcCampaignMD = "";
 
-  uint32_t runNum = eventInfo->runNumber();
+  //uint32_t runNum = eventInfo->runNumber();
+  //std::cout<<"lshi test "<<runNum<<std::endl;
 
-  switch(runNum)
-    {
-    case 284500 :
-      mcCampaignMD="mc20a";
-      break;
-    case 300000 :
-      mcCampaignMD="mc20d";
-      break;
-    case 310000 :
-      mcCampaignMD="mc20e";
-      break;
-    default :
-      ANA_MSG_ERROR( "Could not determine mc campaign from run number! Impossible to autoconfigure PRW. Aborting." );
-      return StatusCode::FAILURE;
-      break;
-    }
-  ANA_MSG_INFO( "Determined MC campaign to be " << mcCampaignMD);
+  //switch(runNum)
+  //  {
+  //  case 284500 :
+  //    mcCampaignMD="mc20a";
+  //    break;
+  //  case 300000 :
+  //    mcCampaignMD="mc20d";
+  //    break;
+  //  case 310000 :
+  //    mcCampaignMD="mc20e";
+  //    break;
+  //  default :
+  //    ANA_MSG_ERROR( "Could not determine mc campaign from run number! Impossible to autoconfigure PRW. Aborting." );
+  //    return StatusCode::FAILURE;
+  //    break;
+  //  }
+  //ANA_MSG_INFO( "Determined MC campaign to be " << mcCampaignMD);
 
   // Extract campaign from user configuration
   std::string tmp_mcCampaign = m_mcCampaign;
@@ -1166,56 +1170,56 @@ StatusCode BasicEventSelection::autoconfigurePileupRWTool()
 	}
     }
 
-  // Sanity checks
-  bool mc20X_GoodFromProperty = !mcCampaignList.empty();
-  bool mc20X_GoodFromMetadata = false;
-  for(const auto& mcCampaignP : mcCampaignList) mc20X_GoodFromProperty &= ( mcCampaignP == "mc20a" || mcCampaignP == "mc20d" || mcCampaignP == "mc20e");
-  if( mcCampaignMD == "mc20a" || mcCampaignMD == "mc20d" || mcCampaignMD == "mc20e") mc20X_GoodFromMetadata = true;
+  //// Sanity checks
+  //bool mc20X_GoodFromProperty = !mcCampaignList.empty();
+  //bool mc20X_GoodFromMetadata = false;
+  //for(const auto& mcCampaignP : mcCampaignList) mc20X_GoodFromProperty &= ( mcCampaignP == "mc20a" || mcCampaignP == "mc20d" || mcCampaignP == "mc20e");
+  //if( mcCampaignMD == "mc20a" || mcCampaignMD == "mc20d" || mcCampaignMD == "mc20e") mc20X_GoodFromMetadata = true;
 
-  if( !mc20X_GoodFromMetadata && !mc20X_GoodFromProperty )
-    {
-      // ::
-      std::string MetadataAndPropertyBAD("");
-      MetadataAndPropertyBAD += "autoconfigurePileupRWTool(): access to FileMetaData failed, but don't panic. You can try to manually set the 'mcCampaign' BasicEventSelection property to ";
-      MetadataAndPropertyBAD += "'mc20a', 'mc20c', 'mc20d', 'mc20e', or 'mc20f' and restart your job. If you set it to any other string, you will still incur in this error.";
-      ANA_MSG_ERROR( MetadataAndPropertyBAD );
-      return StatusCode::FAILURE;
-      // ::
-    }
+  //if( !mc20X_GoodFromMetadata && !mc20X_GoodFromProperty )
+  //  {
+  //    // ::
+  //    std::string MetadataAndPropertyBAD("");
+  //    MetadataAndPropertyBAD += "autoconfigurePileupRWTool(): access to FileMetaData failed, but don't panic. You can try to manually set the 'mcCampaign' BasicEventSelection property to ";
+  //    MetadataAndPropertyBAD += "'mc20a', 'mc20c', 'mc20d', 'mc20e', or 'mc20f' and restart your job. If you set it to any other string, you will still incur in this error.";
+  //    ANA_MSG_ERROR( MetadataAndPropertyBAD );
+  //    return StatusCode::FAILURE;
+  //    // ::
+  //  }
 
-  if ( mc20X_GoodFromProperty && mc20X_GoodFromMetadata)
-    {
-      bool MDinP=false;
-      for(const auto& mcCampaignP : mcCampaignList) MDinP |= (mcCampaignMD==mcCampaignP);
-      if( !MDinP )
-	{
-	  // ::
-	  std::string MetadataAndPropertyConflict("");
-	  MetadataAndPropertyConflict += "autoconfigurePileupRWTool(): access to FileMetaData indicates a " + mcCampaignMD;
-	  MetadataAndPropertyConflict += " sample, but the 'mcCampaign' property passed to BasicEventSelection is set to '" +m_mcCampaign;
-	  MetadataAndPropertyConflict += "'. Prioritizing the value set by user: PLEASE DOUBLE-CHECK the value you set the 'mcCampaign' property to!";
-	  ANA_MSG_WARNING( MetadataAndPropertyConflict );
-	  // ::
-	}
-      else
-	{
-	  // ::
-	  std::string NoMetadataButPropertyOK("");
-	  NoMetadataButPropertyOK += "autoconfigurePileupRWTool(): access to FileMetaData succeeded, but the 'mcCampaign' property is passed to BasicEventSelection as '";
-	  NoMetadataButPropertyOK += m_mcCampaign;
-	  NoMetadataButPropertyOK += "'. Autoconfiguring PRW accordingly.";
-	  ANA_MSG_WARNING( NoMetadataButPropertyOK );
-	  // ::
-	}
-    }
+  //if ( mc20X_GoodFromProperty && mc20X_GoodFromMetadata)
+  //  {
+  //    bool MDinP=false;
+  //    for(const auto& mcCampaignP : mcCampaignList) MDinP |= (mcCampaignMD==mcCampaignP);
+  //    if( !MDinP )
+  //  {
+  //    // ::
+  //    std::string MetadataAndPropertyConflict("");
+  //    MetadataAndPropertyConflict += "autoconfigurePileupRWTool(): access to FileMetaData indicates a " + mcCampaignMD;
+  //    MetadataAndPropertyConflict += " sample, but the 'mcCampaign' property passed to BasicEventSelection is set to '" +m_mcCampaign;
+  //    MetadataAndPropertyConflict += "'. Prioritizing the value set by user: PLEASE DOUBLE-CHECK the value you set the 'mcCampaign' property to!";
+  //    ANA_MSG_WARNING( MetadataAndPropertyConflict );
+  //    // ::
+  //  }
+  //    else
+  //  {
+  //    // ::
+  //    std::string NoMetadataButPropertyOK("");
+  //    NoMetadataButPropertyOK += "autoconfigurePileupRWTool(): access to FileMetaData succeeded, but the 'mcCampaign' property is passed to BasicEventSelection as '";
+  //    NoMetadataButPropertyOK += m_mcCampaign;
+  //    NoMetadataButPropertyOK += "'. Autoconfiguring PRW accordingly.";
+  //    ANA_MSG_WARNING( NoMetadataButPropertyOK );
+  //    // ::
+  //  }
+  //  }
 
-  // ::
-  // Retrieve the input file
-  if(!mc20X_GoodFromProperty)
-    {
-      mcCampaignList.clear();
-      mcCampaignList.push_back(mcCampaignMD);
-    }
+  //// ::
+  //// Retrieve the input file
+  //if(!mc20X_GoodFromProperty)
+  //  {
+  //    mcCampaignList.clear();
+  //    mcCampaignList.push_back(mcCampaignMD);
+  //  }
   ANA_MSG_INFO( "Setting MC campgains for CP::PileupReweightingTool:");
   for(const auto& mcCampaign : mcCampaignList)
     ANA_MSG_INFO( "\t" << mcCampaign.c_str() );
@@ -1248,6 +1252,8 @@ StatusCode BasicEventSelection::autoconfigurePileupRWTool()
 	prwConfigFiles.push_back(PathResolverFindCalibFile(m_prwActualMu2017File));
       if( !m_prwActualMu2018File.empty() && (mcCampaign == "mc20e" || mcCampaign=="mc20f") )
 	prwConfigFiles.push_back(PathResolverFindCalibFile(m_prwActualMu2018File));
+      if( !m_prwActualMu2022File.empty() && (mcCampaign == "mc21a") )
+	prwConfigFiles.push_back(PathResolverFindCalibFile(m_prwActualMu2022File));
     }
 
   // also need to handle lumicalc files: only use 2015+2016 with mc20a

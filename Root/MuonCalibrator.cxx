@@ -137,6 +137,9 @@ EL::StatusCode MuonCalibrator :: initialize ()
     ANA_CHECK(m_muonCalibrationTool_handle.setProperty("do2StationsHighPt", m_do2StationsHighPt));
   }  
   ANA_CHECK(m_muonCalibrationTool_handle.setProperty( "IsRun3Geo", m_isRun3Geo ));
+  if (!m_release.empty()) {
+     ANA_CHECK(m_muonCalibrationTool_handle.setProperty( "release", m_release ));
+  }
   ANA_CHECK(m_muonCalibrationTool_handle.retrieve());
   ANA_MSG_DEBUG("Retrieved tool: " << m_muonCalibrationTool_handle);
 

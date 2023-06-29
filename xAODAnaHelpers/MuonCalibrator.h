@@ -25,6 +25,8 @@ public:
   /** @brief Switch on Run3 geometry for muon selector tool */
   bool           m_isRun3Geo = false;
 
+  std::string    m_release = "";
+
   //// @brief Set Perform special resolution corrections for two-station muons passing the HighPt selection criteria, switch on only when using the HighPt WP
   bool m_do2StationsHighPt = false;
 
