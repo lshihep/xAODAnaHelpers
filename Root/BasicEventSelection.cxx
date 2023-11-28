@@ -544,7 +544,6 @@ EL::StatusCode BasicEventSelection :: initialize ()
   // initialize the CP::PileupReweightingTool
   //
 
-  std::cout<<"lshi test doPUreweighting "<<m_doPUreweighting<<std::endl;
   if ( m_doPUreweighting ) {
 
     std::vector<std::string> PRWFiles;
@@ -595,7 +594,6 @@ EL::StatusCode BasicEventSelection :: initialize ()
       }
     }
 
-    std::cout<<"lshi test autoconfigPRW "<<m_autoconfigPRW<<std::endl;
     if(m_autoconfigPRW)
       {	ANA_CHECK( autoconfigurePileupRWTool() ); }
     else
@@ -615,8 +613,7 @@ EL::StatusCode BasicEventSelection :: initialize ()
         ANA_CHECK( m_pileup_tool_handle.setProperty("LumiCalcFiles", lumiCalcFiles));
       }
     ANA_CHECK( m_pileup_tool_handle.setProperty("UsePeriodConfig", m_periodConfig) );
-    //ANA_CHECK( m_pileup_tool_handle.setProperty("OutputLevel", msg().level() ));
-    ANA_CHECK( m_pileup_tool_handle.setProperty("OutputLevel", msgLvl(MSG::DEBUG) )); // lshi
+    ANA_CHECK( m_pileup_tool_handle.setProperty("OutputLevel", msg().level() ));
     if ( !m_triggerUnprescaleList.empty() ) {
       // We need to make an instance of ITrigDecisionTool:
       asg::AnaToolHandle<Trig::ITrigDecisionTool> iTrigDecTool_handle {"Trig::TrigDecisionTool/TrigDecisionTool"};
