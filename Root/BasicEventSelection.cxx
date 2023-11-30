@@ -565,6 +565,9 @@ EL::StatusCode BasicEventSelection :: initialize ()
         tmp_PRWFileNames.erase(0, pos+1);
       }
     }
+    if( !m_prwActualMu2022File.empty() && (m_mcCampaign == "mc21a") ) // lshi 30 Nov 2023 force actualMu reweighting
+       PRWFiles.push_back(PathResolverFindCalibFile(m_prwActualMu2022File));
+
     while ( tmp_lumiCalcFileNames.size() > 0) {
       size_t pos = tmp_lumiCalcFileNames.find_first_of(',');
       if ( pos == std::string::npos ) {
